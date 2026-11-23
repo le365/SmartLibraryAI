@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7fb">
+    <meta name="description" content="Rút gọn liên kết, tạo mã QR và theo dõi lượt truy cập.">
+    <title>Gọn Link — Quản lý liên kết</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" referrerpolicy="no-referrer"></script>
+    <script defer src="/app.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Gọn Link, về đầu trang">
+        <span class="brand-mark" aria-hidden="true">g</span>
+        <span>gọn<span class="brand-accent">link</span></span>
+      </a>
+      <nav class="main-nav" aria-label="Điều hướng chính" hidden>
+        <a href="#create">Tạo liên kết</a>
+        <a href="#links">Thống kê</a>
+      </nav>
+      <div class="header-actions">
+        <span id="accountLabel" class="account-label" hidden></span>
+        <button id="logoutButton" class="button button-quiet button-small" type="button" hidden>Đăng xuất</button>
+        <button id="themeToggle" class="button button-quiet button-small theme-toggle" type="button" aria-label="Đổi giao diện">☾ <span>Giao diện tối</span></button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span> LIÊN KẾT NGẮN, THỐNG KÊ RÕ</p>
+          <h1 id="heroTitle">Chia sẻ gọn.<br><span>Theo dõi thông minh.</span></h1>
+          <p class="hero-description">Biến đường dẫn dài thành liên kết dễ nhớ, tạo mã QR và xem hiệu quả chỉ trong một nơi.</p>
+          <div class="hero-points">
+            <span><span class="check-mark">✓</span> Mã QR tức thì</span>
+            <span><span class="check-mark">✓</span> Thống kê lượt nhấp</span>
+          </div>
+        </div>
+
+        <section id="create" class="card shortener-card" aria-labelledby="createTitle">
+          <div class="card-heading">
+            <div class="heading-icon" aria-hidden="true">↗</div>
+            <div>
+              <h2 id="createTitle">Rút gọn liên kết</h2>
+              <p>Đăng nhập để lưu và theo dõi liên kết của bạn.</p>
+            </div>
+          </div>
+          <form id="shortenForm">
+            <label for="originalUrl">Đường dẫn cần rút gọn</label>
+            <div class="input-with-icon">
+              <span aria-hidden="true">↗</span>
+              <input id="originalUrl" name="original_url" type="url" inputmode="url" placeholder="https://example.com/duong-dan-rat-dai" maxlength="2048" required>
+            </div>
+            <details class="advanced-options">
+              <summary>Tùy chỉnh liên kết <span aria-hidden="true">＋</span></summary>
+              <div class="advanced-fields">
+                <div>
+                  <label for="customAlias">Bí danh (không bắt buộc)</label>
+                  <div class="alias-input"><span>/s/</span><input id="customAlias" name="custom_alias" type="text" minlength="3" maxlength="48" pattern="[A-Za-z0-9_\x2D]{3,48}" placeholder="ten-cua-ban"></div>
+                  <small>3–48 ký tự: chữ, số, gạch nối hoặc gạch dưới.</small>
+                </div>
+                <div>
+                  <label for="linkTitle">Tiêu đề (không bắt buộc)</label>
+                  <input id="linkTitle" name="title" type="text" maxlength="120" placeholder="Tên chiến dịch hoặc nội dung">
+                </div>
+                <div>
+                  <label for="expiresAt">Ngày hết hạn (không bắt buộc)</label>
+                  <input id="expiresAt" name="expires_at" type="date">
+                </div>
+              </div>
+            </details>
+            <button id="shortenButton" class="button button-primary button-wide" type="submit">
+              <span>Rút gọn ngay</span><span aria-hidden="true">→</span>
+            </button>
+            <p id="shortenMessage" class="form-message" role="status" aria-live="polite"></p>
+          </form>
+
+          <section id="resultPanel" class="result-panel" aria-live="polite" hidden>
+            <div class="result-copy">
+              <p class="result-label">LIÊN KẾT CỦA BẠN</p>
+              <a id="shortUrl" class="short-url" href="#" target="_blank" rel="noopener noreferrer"></a>
+              <div class="result-actions">
+                <button id="copyResultButton" class="button button-primary button-small" type="button">Sao chép</button>
+                <button id="downloadQrButton" class="button button-outline button-small" type="button">Tải mã QR</button>
+              </div>
+            </div>
+            <div class="qr-wrap">
+              <div id="qrCode" class="qr-code" aria-label="Mã QR cho liên kết rút gọn"></div>
+              <span id="qrMessage" class="qr-message">Mã QR cho liên kết của bạn</span>
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <section id="authPanel" class="auth-section" aria-labelledby="authTitle">
+        <div class="auth-intro">
+          <p class="eyebrow">KHU VỰC CÁ NHÂN</p>
+          <h2 id="authTitle">Quản lý mọi liên kết<br>trong một nơi.</h2>
+          <p>Tạo tài khoản miễn phí để lưu liên kết, bật/tắt khi cần và xem lượt truy cập.</p>
+        </div>
+        <div class="card auth-card">
+          <div class="auth-tabs" role="tablist" aria-label="Đăng nhập hoặc đăng ký">
+            <button id="loginTab" class="auth-tab is-active" type="button" role="tab" aria-selected="true">Đăng nhập</button>
+            <button id="registerTab" class="auth-tab" type="button" role="tab" aria-selected="false">Tạo tài khoản</button>
+          </div>
+          <form id="authForm">
+            <div id="usernameField" class="field" hidden>
+              <label for="username">Tên người dùng</label>
+              <input id="username" name="username" type="text" minlength="3" maxlength="32" pattern="[A-Za-z0-9_.\x2D]{3,32}" autocomplete="username">
+            </div>
+            <div id="emailField" class="field" hidden>
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" maxlength="254" autocomplete="email">
+            </div>
+            <div id="identifierField" class="field">
+              <label for="identifier">Email hoặc tên người dùng</label>
+              <input id="identifier" name="identifier" type="text" maxlength="254" autocomplete="username" required>
+            </div>
+            <div class="field">
+              <label for="password">Mật khẩu</label>
+              <input id="password" name="password" type="password" minlength="10" maxlength="128" autocomplete="current-password" required>
+              <small id="passwordHint" hidden>Tối thiểu 10 ký tự.</small>
+            </div>
+            <button id="authSubmit" class="button button-dark button-wide" type="submit">Đăng nhập <span aria-hidden="true">→</span></button>
+            <p id="authMessage" class="form-message" role="status" aria-live="polite"></p>
+          </form>
+          <p class="privacy-note"><span aria-hidden="true">▣</span> Phiên đăng nhập được bảo vệ bằng cookie HttpOnly.</p>
+        </div>
+      </section>
+
+      <section id="workspace" class="workspace" aria-labelledby="workspaceTitle" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">TỔNG QUAN</p>
+            <h2 id="workspaceTitle">Không gian liên kết</h2>
+          </div>
+          <button id="refreshButton" class="button button-outline button-small" type="button"><span aria-hidden="true">↻</span> Làm mới</button>
+        </div>
+        <div class="metric-grid">
+          <article class="card metric-card">
+            <span class="metric-icon metric-blue" aria-hidden="true">↗</span>
+            <div><p>Tổng liên kết</p><strong id="totalLinks">0</strong></div>
+          </article>
+          <article class="card metric-card">
+            <span class="metric-icon metric-green" aria-hidden="true">⌁</span>
+            <div><p>Tổng lượt nhấp</p><strong id="totalClicks">0</strong></div>
+          </article>
+          <article class="card metric-card">
+            <span class="metric-icon metric-amber" aria-hidden="true">●</span>
+            <div><p>Đang hoạt động</p><strong id="activeLinks">0</strong></div>
+          </article>
+        </div>
+
+        <section id="links" class="card links-card" aria-labelledby="linksTitle">
+          <div class="section-heading links-heading">
+            <div>
+              <h2 id="linksTitle">Liên kết của bạn</h2>
+              <p class="muted">Quản lý, sao chép và theo dõi từng liên kết.</p>
+            </div>
+            <label class="search-box" for="linkSearch"><span aria-hidden="true">⌕</span><input id="linkSearch" type="search" placeholder="Tìm liên kết"></label>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>LIÊN KẾT</th><th>LINK NGẮN</th><th>ĐÃ NHẤP</th><th>TRẠNG THÁI</th><th>NGÀY TẠO</th><th><span class="sr-only">Thao tác</span></th></tr>
+              </thead>
+              <tbody id="linksTableBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state" hidden>
+              <span class="empty-icon" aria-hidden="true">↗</span>
+              <h3>Chưa có liên kết nào</h3>
+              <p>Tạo liên kết đầu tiên ở phía trên để bắt đầu theo dõi.</p>
+              <a class="button button-outline button-small" href="#create">Tạo liên kết</a>
+            </div>
+            <p id="loadMessage" class="form-message table-message" role="status" aria-live="polite"></p>
+          </div>
+        </section>
+
+        <section id="statsPanel" class="card stats-card" aria-labelledby="statsTitle" hidden>
+          <div class="section-heading stats-heading">
+            <div>
+              <p class="eyebrow">PHÂN TÍCH LIÊN KẾT</p>
+              <h2 id="statsTitle">Thống kê truy cập</h2>
+              <p id="statsLinkLabel" class="muted"></p>
+            </div>
+            <div class="stats-controls">
+              <label for="statsRange" class="sr-only">Khoảng thời gian thống kê</label>
+              <select id="statsRange">
+                <option value="7">7 ngày</option>
+                <option value="30" selected>30 ngày</option>
+                <option value="90">90 ngày</option>
+                <option value="365">365 ngày</option>
+              </select>
+              <button id="closeStatsButton" class="button button-quiet button-small" type="button" aria-label="Đóng thống kê">Đóng</button>
+            </div>
+          </div>
+          <div class="stats-total"><strong id="statsTotal">0</strong><span>lượt nhấp trong khoảng thời gian</span></div>
+          <div class="stats-grid">
+            <section class="stats-block"><h3>Lượt nhấp theo ngày</h3><div id="dailyStats" class="bar-list"></div></section>
+            <section class="stats-block"><h3>Thiết bị</h3><div id="deviceStats" class="bar-list"></div></section>
+            <section class="stats-block"><h3>Quốc gia</h3><div id="countryStats" class="bar-list"></div></section>
+          </div>
+          <p id="statsMessage" class="form-message" role="status" aria-live="polite"></p>
+        </section>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="brand brand-footer" href="/"><span class="brand-mark" aria-hidden="true">g</span><span>gọn<span class="brand-accent">link</span></span></a>
+      <span>Liên kết ngắn hơn, hành trình rõ ràng hơn.</span>
+      <span>© <span id="currentYear"></span> Gọn Link</span>
+    </footer>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "smartlibrary-ai-worker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --local",
+    "check": "wrangler deploy --dry-run --env=\"\"",
+    "deploy": "wrangler deploy",
+    "db:local:migrate": "wrangler d1 migrations apply DB --local",
+    "db:remote:migrate": "wrangler d1 migrations apply DB --remote --env production",
+    "types": "wrangler types"
+  },
+  "dependencies": {
+    "hono": "^4.13.20"
+  },
+  "devDependencies": {
+    "wrangler": "^4.166.0"
+  }
+}
