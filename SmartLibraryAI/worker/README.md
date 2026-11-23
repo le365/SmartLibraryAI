@@ -70,9 +70,13 @@ Không dùng lệnh này với `--remote` để cấp quyền trên môi trườ
 | Returns | `GET /api/returns`, `POST /api/returns/:borrowingId` | Admin/Librarian |
 | Statistics | `GET /api/statistics/overview`, `GET /api/statistics/borrowings?days=30`, `GET /api/statistics/categories` | Reader xem số liệu cá nhân; nhân viên xem tổng hợp |
 | Chat | `POST /api/chat`, `GET /api/chat/:conversationId` | Đã đăng nhập, cần AI service; lịch sử được lưu theo chủ sở hữu |
-| AI classification | `POST /api/ai/classify`, `GET /api/ai/classifications` | Admin/Librarian, cần AI service |
+| AI classification | `POST /api/ai/classify-cover`, `GET /api/ai/classifications` | Admin/Librarian; ảnh gửi tới AI service và kết quả thật lưu trong D1 |
+| AI review | `PATCH /api/ai/classifications/:id/review` | Admin/Librarian xác nhận/sửa nhãn; nếu gắn với sách, danh mục sách cũng được cập nhật |
 
-Các endpoint có body yêu cầu `Content-Type: application/json`. JSON thành công được bọc trong `{ "data": ... }`; lỗi có dạng
+`POST /api/ai/classify-cover` nhận `multipart/form-data` với field `file` (JPEG,
+PNG hoặc WebP, tối đa 5 MiB), và tùy chọn `bookId`; có thể bỏ ảnh khi sách đã có
+cover trong R2. Nếu không gắn sách, cần gửi thêm field `title`. JSON thành công
+được bọc trong `{ "data": ... }`; lỗi có dạng
 `{ "error": { "code", "message", "requestId" } }`. Danh sách hỗ trợ `limit`
 (1-100) và `offset`.
 
@@ -91,6 +95,8 @@ Migration đặt ở `../database/migrations`:
   kết chi tiết yêu cầu.
 - `0006_r2_book_covers.sql`: lưu R2 object key, MIME type và kích thước ảnh;
   D1 không lưu nội dung ảnh hay Base64.
+- `0007_book_cover_classification_review.sql`: thêm sáu lớp phân loại và trạng
+  thái thủ thư xác nhận/chỉnh sửa nhãn AI.
 
 Độc giả chỉ gửi yêu cầu khi sách còn ít nhất một bản. Duyệt yêu cầu dùng D1
 batch với cập nhật có điều kiện để tránh vượt tồn kho; nếu bản cuối đã được cấp
@@ -185,19 +191,27 @@ chỉ thực hiện dry-run, không deploy.
 
 ## Cấu hình AI local
 
-AI endpoint không giả lập kết quả thành công. Nếu chưa cấu hình, Chat và AI
-classification trả `503 AI_SERVICE_NOT_CONFIGURED`. Khi có AI service local
-thực sự, đặt `AI_SERVICE_URL` bằng URL trong `.dev.vars` (file này đã gitignore)
-và khởi động lại Wrangler:
+AI Service dùng Python 3.12, FastAPI và TensorFlow/Keras; xem
+[`ai-service/README.md`](../ai-service/README.md) để cài dependencies, chuẩn bị
+dataset, huấn luyện MobileNetV2 và đánh giá model. Repository chưa có dataset
+hoặc model đã huấn luyện. Khi chưa có model, API trả `503 MODEL_NOT_TRAINED`,
+không tạo kết quả giả và không ghi bản phân loại vào D1.
+
+Khởi động AI Service ở terminal riêng trong `ai-service`, sau đó đặt URL và
+cùng service token trong `worker/.dev.vars` (file này không commit):
 
 ```dotenv
 AI_SERVICE_URL=http://127.0.0.1:8000/
 AI_SERVICE_TOKEN=local-development-token
 ```
 
-Token chỉ cần khi AI service yêu cầu. Worker chỉ cho phép HTTP khi
-`APP_ENV=development`; môi trường triển khai phải dùng HTTPS và đặt token bằng
-Cloudflare secret, không lưu trong Git.
+AI Service local cũng cần chạy với `AI_SERVICE_TOKEN` có cùng giá trị. Khởi
+động lại Wrangler sau khi sửa `.dev.vars`. Worker chỉ cho phép HTTP trong
+development; môi trường triển khai phải dùng HTTPS và đặt token bằng secret
+manager, không lưu trong Git. AI API nhận ảnh tại `POST /predict`; Worker
+chuyển tiếp ảnh tới service, kiểm tra response rồi lưu top 3 và nhãn dự đoán
+trong D1. Thủ thư có thể xác nhận hoặc sửa nhãn qua giao diện AI; với bản ghi
+đã gắn sách, nhãn được duyệt sẽ cập nhật danh mục sách.
 
 ## AI service production
 

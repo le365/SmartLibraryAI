@@ -15,7 +15,7 @@ const routePermissions = {
   "/books": [ROLE.ADMIN, ROLE.LIBRARIAN, ROLE.READER],
   "/readers": [ROLE.ADMIN, ROLE.LIBRARIAN],
   "/loans": [ROLE.ADMIN, ROLE.LIBRARIAN, ROLE.READER],
-  "/ai": [ROLE.ADMIN],
+  "/ai": [ROLE.ADMIN, ROLE.LIBRARIAN],
   "/chat": [ROLE.ADMIN, ROLE.LIBRARIAN, ROLE.READER],
   "/statistics": [ROLE.ADMIN],
 };

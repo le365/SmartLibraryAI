@@ -84,16 +84,20 @@ Cloudflare R2     Python + FastAPI
 ### AI service riêng: Python + FastAPI + TensorFlow/Keras
 
 - Chạy như dịch vụ độc lập, không chạy TensorFlow trong Cloudflare Workers.
-- FastAPI cung cấp endpoint nội bộ cho gợi ý, tìm kiếm ngữ nghĩa hoặc phân
-  loại metadata.
-- TensorFlow/Keras thực hiện suy luận; quy trình huấn luyện và lưu model cần
-  được quản lý riêng.
+- `POST /predict` nhận ảnh bìa và trả nhãn, độ tin cậy, top 3; MobileNetV2
+  transfer learning được huấn luyện bằng dataset có sáu lớp do thư viện chuẩn
+  bị.
+- Chưa có dataset/model huấn luyện trong repository. Khi thiếu model, API trả
+  `503 MODEL_NOT_TRAINED`; không tạo dự đoán giả.
 - Không cho AI service truy cập trực tiếp D1/R2. Worker chỉ gửi dữ liệu tối
   thiểu cần thiết, loại bỏ thông tin nhận dạng cá nhân không cần thiết, và
-  kiểm tra phản hồi trước khi trả về frontend.
+  kiểm tra phản hồi trước khi ghi kết quả vào D1.
+- Thủ thư có thể xác nhận hoặc chỉnh sửa nhãn. Worker lưu trạng thái duyệt và
+  cập nhật danh mục sách liên kết trong D1.
 - Cần chọn nơi triển khai AI service theo yêu cầu runtime, GPU/CPU, độ trễ,
   bảo mật và ngân sách ở giai đoạn triển khai; tài liệu này không tạo hoặc
-  chọn tài nguyên Cloud trả phí.
+  chọn tài nguyên Cloud trả phí. Xem [`ai-service/README.md`](../ai-service/README.md)
+  để biết các giới hạn free tier và giá tham khảo từ trang chính thức.
 
 ## 3. Luồng dữ liệu dự kiến
 
@@ -101,10 +105,10 @@ Cloudflare R2     Python + FastAPI
 2. Frontend gửi request HTTPS đến Worker.
 3. Worker xác thực người dùng, kiểm tra quyền và dữ liệu đầu vào.
 4. Worker đọc/ghi dữ liệu nghiệp vụ trong D1 hoặc thao tác object trong R2.
-5. Với tác vụ AI, Worker gửi request tối thiểu đến FastAPI; AI service trả kết
-   quả suy luận, Worker kiểm tra rồi trả response phù hợp.
-6. Frontend hiển thị kết quả; các hành động thay đổi dữ liệu vẫn phải qua kiểm
-   tra nghiệp vụ của Worker.
+5. Với tác vụ AI, Worker gửi ảnh tới FastAPI; AI service trả dự đoán, Worker
+   kiểm tra và lưu top 3 cùng nhãn dự đoán vào D1.
+6. Thủ thư xác nhận hoặc sửa nhãn qua Worker; nếu có sách liên kết, Worker cập
+   nhật danh mục của sách trong D1.
 
 ## 4. Bảo mật và vận hành
 

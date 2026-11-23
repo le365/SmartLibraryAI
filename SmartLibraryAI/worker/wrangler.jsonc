@@ -1,48 +1,53 @@
 {
-  "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "smartlibrary-ai-api",
-  "main": "src/index.js",
-  "compatibility_date": "2026-11-23",
-  "workers_dev": true,
-  "vars": {
-    "APP_ENV": "development",
-    "CORS_ORIGINS": "http://localhost:5173,http://127.0.0.1:5173"
-  },
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "smartlibrary-local",
-      "database_id": "00000000-0000-0000-0000-000000000001",
-      "migrations_dir": "../database/migrations"
-    }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "BOOK_COVERS",
-      "bucket_name": "smartlibrary-covers-local"
-    }
-  ],
-  "env": {
-    "production": {
-      "name": "smartlibrary-ai-api-production",
-      "vars": {
-        "APP_ENV": "production",
-        "CORS_ORIGINS": ""
-      },
-      "d1_databases": [
-        {
-          "binding": "DB",
-          "database_name": "smartlibrary-production",
-          "database_id": "00000000-0000-0000-0000-000000000002",
-          "migrations_dir": "../database/migrations"
-        }
-      ],
-      "r2_buckets": [
-        {
-          "binding": "BOOK_COVERS",
-          "bucket_name": "smartlibrary-covers-production"
-        }
-      ]
-    }
-  }
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "smartlibrary-ai-api",
+	"main": "src/index.js",
+	"compatibility_date": "2026-11-23",
+	"workers_dev": true,
+	"vars": {
+		"APP_ENV": "development",
+		"CORS_ORIGINS": "http://localhost:5173,http://127.0.0.1:5173"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "smartlibrary-local",
+			"database_id": "4cba6e31-4171-40d1-986b-58b5b72edfde",
+			"migrations_dir": "../database/migrations"
+		},
+		{
+			"binding": "smartlibrary_db",
+			"database_name": "smartlibrary-db",
+			"database_id": "4cba6e31-4171-40d1-986b-58b5b72edfde"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "BOOK_COVERS",
+			"bucket_name": "smartlibrary-covers-local"
+		}
+	],
+	"env": {
+		"production": {
+			"name": "smartlibrary-ai-api-production",
+			"vars": {
+				"APP_ENV": "production",
+				"CORS_ORIGINS": ""
+			},
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "smartlibrary-production",
+					"database_id": "4cba6e31-4171-40d1-986b-58b5b72edfde",
+					"migrations_dir": "../database/migrations"
+				}
+			],
+			"r2_buckets": [
+				{
+					"binding": "BOOK_COVERS",
+					"bucket_name": "smartlibrary-covers-production"
+				}
+			]
+		}
+	}
 }

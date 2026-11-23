@@ -11,7 +11,7 @@ SmartLibraryAI/
 ├── frontend/                 # Giao diện React + Vite
 ├── worker/                   # REST API trên Cloudflare Workers
 ├── database/migrations/      # Migration D1
-├── ai-service/app/           # Dự kiến: Python + FastAPI + TensorFlow/Keras
+├── ai-service/               # Python + FastAPI + TensorFlow/Keras; model do người vận hành huấn luyện
 └── docs/                     # Kế hoạch và kiến trúc
 ```
 
@@ -22,6 +22,8 @@ SmartLibraryAI/
 - Tài khoản đăng ký công khai có vai trò Reader. Phân quyền được xác minh ở
   Worker; chỉ quản trị viên được cấp quyền Admin/Librarian.
 - Trang thống kê vẫn có một số biểu đồ minh họa, chưa kết nối API thống kê.
+- AI service và luồng phân loại ảnh đã có bộ khung; chưa có dataset/model nên
+  endpoint suy luận chưa trả dự đoán cho đến khi huấn luyện xong.
 - Chưa tạo database D1 Cloud, chưa triển khai Worker/Pages và chưa tạo tài
   nguyên Cloud trả phí.
 
@@ -62,6 +64,11 @@ npx wrangler d1 execute DB --local --command "UPDATE users SET role = 'Admin' WH
 
 Chỉ dùng lệnh này cho D1 local. Không cấp quyền bằng cách gửi role từ frontend
 và không chạy lệnh `--remote` trừ khi chủ động cấu hình Cloud.
+
+Để chạy AI API, cài Python 3.12 theo
+[`ai-service/README.md`](ai-service/README.md), chuẩn bị dataset và huấn luyện
+model trước. Chỉ khi model đã có mới kết nối Worker bằng `worker/.dev.vars`;
+không có model thì API trả trạng thái `MODEL_NOT_TRAINED`.
 
 ## Kiểm tra
 

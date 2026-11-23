@@ -372,6 +372,27 @@ a { color: inherit; text-decoration: none; }
 .upload-disclaimer { display: flex; align-items: center; gap: 7px; margin: 12px 20px; color: #99a4b4; font-size: 9px; }
 .upload-disclaimer .online-dot { width: 6px; height: 6px; box-shadow: none; }
 .ai-upload-panel > .button { width: calc(100% - 38px); margin: 0 19px; min-height: 38px; }
+.ai-classify-form { display: grid; gap: 12px; padding: 0 19px; }
+.ai-classify-form .upload-zone { margin: 0; }
+.ai-classify-form > .button { min-height: 38px; }
+.ai-error { margin: 0; font-size: 11px; }
+.ai-label-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin: 0; padding: 0 20px; list-style: none; }
+.ai-label-list li { padding: 10px 11px; border: 1px solid #edf0f5; border-radius: 8px; color: #53627a; background: #fbfcfe; font-size: 10px; }
+.ai-history-panel { margin-top: 15px; }
+.ai-classification-list { display: grid; gap: 10px; padding: 0 19px 19px; }
+.ai-review-card { padding: 14px; border: 1px solid #edf0f5; border-radius: 10px; background: #fff; }
+.ai-review-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.ai-review-heading > div { display: grid; gap: 4px; }
+.ai-review-heading strong { color: #43516a; font-size: 12px; }
+.ai-review-heading span:not(.badge) { color: #929eaf; font-size: 9px; }
+.ai-predicted-label { margin: 10px 0; color: #7d899b; font-size: 10px; }
+.ai-predicted-label strong { color: #566a91; }
+.ai-top-predictions { display: grid; gap: 6px; margin: 0 0 12px; padding-left: 18px; color: #748197; font-size: 10px; }
+.ai-top-predictions li { padding-left: 2px; }
+.ai-top-predictions li strong { margin-left: 8px; color: #596e93; }
+.ai-review-actions { display: flex; align-items: end; gap: 10px; }
+.ai-review-actions .form-field { flex: 1; }
+.ai-review-actions .button { min-height: 38px; }
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .classification-result { margin: 15px 19px 0; padding: 13px; border: 1px solid #e5f1ea; border-radius: 9px; background: #fbfefc; animation: fade-in .2s ease; }
@@ -581,6 +602,8 @@ a { color: inherit; text-decoration: none; }
   .ai-hero h2 { font-size: 17px; }
   .ai-hero-copy > p { max-width: 340px; font-size: 9px; }
   .ai-workspace-grid { grid-template-columns: 1fr; }
+  .ai-label-list { grid-template-columns: 1fr; }
+  .ai-review-actions { align-items: stretch; flex-direction: column; }
   .chat-layout { min-height: 570px; grid-template-columns: 1fr; }
   .chat-sidebar { display: none; }
   .chat-window { min-height: 570px; }

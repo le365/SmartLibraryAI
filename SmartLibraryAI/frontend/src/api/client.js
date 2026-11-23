@@ -116,6 +116,23 @@ export const api = {
       body: { note },
     }),
   },
+  ai: {
+    classifications: (params = {}) => request("/api/ai/classifications", {
+      query: { limit: params.limit ?? 50, offset: params.offset ?? 0, bookId: params.bookId },
+    }),
+    classifyCover: ({ file, ...metadata }) => {
+      const body = new FormData();
+      if (file) body.append("file", file);
+      for (const [key, value] of Object.entries(metadata)) {
+        if (value) body.append(key, value);
+      }
+      return request("/api/ai/classify-cover", { method: "POST", body });
+    },
+    reviewClassification: (id, category) => request(
+      `/api/ai/classifications/${encodeURIComponent(id)}/review`,
+      { method: "PATCH", body: { category } },
+    ),
+  },
 };
 
 export { API_BASE_URL };
